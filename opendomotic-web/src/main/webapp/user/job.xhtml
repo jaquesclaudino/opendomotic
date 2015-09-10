@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../template/default.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:comp="http://java.sun.com/jsf/composite/comp">
+
+    <ui:define name="content">
+
+        <!-- DIALOG -->
+        <comp:crudDialog header="#{msg.Job}" mb="#{jobMB}">
+            <p:panel header="#{msg.Input}">
+                <p:tabView id="tabView" activeIndex="#{jobMB.tabActiveIndex}">    
+                    <p:tab id="tab1" title="#{msg.Device}">  
+                        <h:panelGrid columns="2" columnClasses="textRight">
+                            <h:outputText value="#{msg.Device}"/>
+                            <h:selectOneMenu value="#{jobMB.idInput}">
+                                <f:selectItem itemLabel="#{msg.None}" itemValue="#{null}"/>
+                                <f:selectItems value="#{configMB.listAllOrderByName}" var="d" itemValue="#{d.id}" itemLabel="#{d.name}"/>
+                            </h:selectOneMenu>  
+
+                            <h:outputText value="#{msg.Operator}"/>
+                            <h:selectOneMenu value="#{jobMB.entity.operator}">
+                                <f:selectItems value="#{jobMB.listOperator}"/>
+                            </h:selectOneMenu>  
+
+                            <h:outputText value="#{msg.ExpectValue}"/>
+                            <p:inputText value="#{jobMB.entity.expectValue}"/>
+                        </h:panelGrid>  
+                    </p:tab>  
+
+                    <p:tab id="tab2" title="#{msg.Date}">  
+                        <p:calendar value="#{jobMB.entity.inputDate}" mode="inline"/>
+                        <br/>
+                        #{msg.Hour}
+                        <p:spinner value="#{jobMB.hour}" min="0" max="23" size="2"/>
+                        :
+                        <p:spinner value="#{jobMB.minute}" min="0" max="59" size="2"/>
+                    </p:tab>   
+                </p:tabView>
+
+            </p:panel>
+
+            <br/>
+
+            <p:panel header="#{msg.Output}">
+                <h:panelGrid columns="2" columnClasses="textRight">
+                    <h:outputText value="#{msg.Device}"/>
+                    <h:selectOneMenu value="#{jobMB.idOutput}">
+                        <f:selectItems value="#{configMB.listAllOrderByName}" var="d" itemValue="#{d.id}" itemLabel="#{d.name}"/>
+                    </h:selectOneMenu>  
+
+                    <h:outputText value="#{msg.ActionValue}"/>
+                    <p:inputText value="#{jobMB.entity.actionValue}"/>
+
+                    <h:outputText value="#{msg.DeleteAfterExecute}"/>
+                    <p:selectBooleanCheckbox value="#{jobMB.entity.deleteAfterExecute}"/>
+                </h:panelGrid>          
+            </p:panel>
+
+            <br/>
+
+            <h:panelGrid columns="2">
+                #{msg.Index}
+                <p:spinner value="#{jobMB.entity.index}" size="3"/>  
+                
+                #{msg.Enabled}
+                <p:selectBooleanCheckbox value="#{jobMB.entity.enabled}"/>  
+            </h:panelGrid>
+        </comp:crudDialog>
+
+        <!-- TABLE -->
+        <comp:crudTable mb="#{jobMB}" rows="20">
+            <p:column headerText="#{msg.Index}">
+                #{item.index}
+            </p:column>
+            <p:column headerText="#{msg.Input}">
+                #{item.inputDescription}
+            </p:column>
+            <p:column headerText="#{msg.Output}">
+                #{item.outputDescription}
+            </p:column>            
+            <p:column headerText="#{msg.Delete}" style="text-align: center;">
+                <p:graphicImage value="../resources/images/button/checked.png" rendered="#{item.deleteAfterExecute}"/>
+                <p:graphicImage value="../resources/images/button/unchecked.png" rendered="#{!item.deleteAfterExecute}"/>
+            </p:column>
+            <p:column headerText="#{msg.Enabled}" style="text-align: center;">
+                <p:graphicImage value="../resources/images/button/checked.png" rendered="#{item.enabled}"/>
+                <p:graphicImage value="../resources/images/button/unchecked.png" rendered="#{!item.enabled}"/>
+            </p:column>
+        </comp:crudTable>
+
+    </ui:define>
+
+</ui:composition>

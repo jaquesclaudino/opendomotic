@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../template/default.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:comp="http://java.sun.com/jsf/composite/comp">
+
+    <ui:define name="content">
+
+        <!-- DIALOG -->
+        <comp:crudDialog id="dialog" header="#{msg.Environment}" mb="#{environmentMB}" updateSalvar="dialog">                   
+            <h:panelGrid columns="2">
+                <h:outputText value="#{msg.Name}"/>
+                <p:inputText value="#{environmentMB.entity.name}"/>
+
+                <h:outputText value="#{msg.Image}"/>
+                <h:outputText value="#{msg.SaveToEnableUpload}" rendered="#{environmentMB.entity.id == null}"/>
+                <h:panelGroup rendered="#{environmentMB.entity.id != null}">
+                    <p:graphicImage 
+                        value="../resources/images/#{environmentMB.entity.fileName}" 
+                        height="200" 
+                        rendered="#{!empty environmentMB.entity.fileName}"/>
+
+                    <p:fileUpload fileUploadListener="#{environmentMB.handleFileUpload}"  
+                        label="#{msg.Upload}"
+                        mode="advanced"  
+                        update="dialog"  
+                        auto="true"  
+                        allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
+                </h:panelGroup>
+            </h:panelGrid>                  
+        </comp:crudDialog>
+
+        <!-- TABLE -->
+        <comp:crudTable mb="#{environmentMB}" rows="10" customButtonValue="#{msg.DevicePosition}" customButtonAction="/admin/position" customButton="true">
+            <p:column headerText="#{msg.Name}">
+                #{item.name}
+            </p:column>
+            <p:column headerText="#{msg.Image}">                  
+                <p:graphicImage 
+                    value="../resources/images/#{item.fileName}" 
+                    height="100" 
+                    rendered="#{!empty item.fileName}"/>
+                #{item.fileName}
+            </p:column>
+        </comp:crudTable>
+            
+    </ui:define>
+
+</ui:composition>

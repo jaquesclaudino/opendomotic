@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link href="../resources/css/default.css" rel="stylesheet" type="text/css" />
+        <link href="../resources/images/opendomotic.png" rel="icon" type="image/png"/>       
+        <title>opendomotic</title>
+    </h:head>
+
+    <h:body>
+        <f:loadBundle basename="messages" var="msg"/>
+        
+        <h:form id="form">
+            <div id="top">            
+                <p:toolbar>
+                    <p:toolbarGroup>
+                        <h:panelGrid columns="#{homeMB.adminLogged ? 7 : 5}">
+                            <h:outputText value="#{msg.Environment}" rendered="#{environmentMB.listAll.size() > 1}"/> 
+                            <h:selectOneMenu value="#{homeMB.idEnvironment}" rendered="#{environmentMB.listAll.size() > 1}">
+                                <f:selectItems value="#{environmentMB.listAll}" var="e" itemValue="#{e.id}" itemLabel="#{e.name}"/>
+                                <p:ajax process="@form" update="@form"/>
+                            </h:selectOneMenu>   
+                            
+                            <p:commandButton ajax="false" action="/user/index" icon="icon-home" value="#{msg.Home}" />
+                            <p:commandButton ajax="false" action="/user/history" icon="icon-history" value="#{msg.History}" />   
+                            <p:commandButton ajax="false" action="/user/job" icon="icon-job" value="#{msg.Job}" />    
+                            <p:commandButton ajax="false" action="/admin/config" icon="icon-config" value="#{msg.Device}" rendered="#{homeMB.adminLogged}"/>
+                            <p:commandButton ajax="false" action="/admin/environment" icon="icon-environment" value="#{msg.Environment}" rendered="#{homeMB.adminLogged}"/>
+                        </h:panelGrid>
+                    </p:toolbarGroup> 
+                </p:toolbar>
+            </div>
+
+            <br/>
+            
+            <div id="content" class="center_content">
+                <h:panelGroup id="content">
+                    <p:growl id="messages" showDetail="true"/>
+                    <ui:insert name="content">Content</ui:insert>
+                </h:panelGroup>
+            </div>
+
+            <br/>
+        
+            <div id="bottom">
+
+            </div>
+
+            <p:ajaxStatus style="width:64px;height:64px;position:fixed;right:5px;top:5px">  
+                <f:facet name="start">  
+                    <p:graphicImage value="../resources/images/loading.gif" />  
+                </f:facet>  
+
+                <f:facet name="complete">  
+                    <h:outputText value="" />  
+                </f:facet>  
+            </p:ajaxStatus>
+        </h:form>
+    </h:body>
+
+</html>

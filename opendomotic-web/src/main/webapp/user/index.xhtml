@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../template/default.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html">
+
+    <ui:define name="content">
+        <h:outputScript library="js" name="websocket.js"/>
+        <h:outputScript library="js" name="device.js"/>
+        <h:outputScript library="js" name="canvasCore.js"/>
+        <h:outputScript library="js" name="canvasUser.js"/>
+
+        <h:panelGroup rendered="#{empty configMB.listAll}">
+            <h:commandLink style="font-weight: bold;" value="#{msg.WithoutDevice}" action="/admin/config"/>
+            <br/>
+            <br/>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{empty environmentMB.listAll}">
+            <h:commandLink style="font-weight: bold;" value="#{msg.WithoutEnvironment}" action="/admin/environment"/>
+            <br/>
+            <br/>
+        </h:panelGroup>
+
+        <h:panelGroup id="panelGroupCanvas" rendered="#{!empty environmentMB.listAll}">
+            <f:event type="preRenderView" listener="#{homeMB.checkParamName}"/>
+            
+            <div style="width: 100%; height: 100%; overflow: auto;">
+                <canvas id="canvas"></canvas>
+            </div>
+            <script>
+                drawCanvas(#{homeMB.idEnvironment});
+            </script>
+
+            <!--<label id="log">log</label>-->
+        </h:panelGroup>
+    </ui:define>    
+    
+</ui:composition>

@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <h:head>
+        <title>opendomotic</title>
+    </h:head>
+    <h:body>
+        <h:panelGrid columns="1" style="margin: 0 auto;" rendered="#{!loginMB.authenticated}">
+            <f:loadBundle basename="messages" var="msg"/>
+            <h:form>
+                <p:panel id="panel" header="opendomotic">              
+                    <p:focus context="panel"/>
+                    <p:growl id="growl"/>
+                    <h:panelGrid columns="2" style="margin: 0 auto;">
+                        <h:outputText value="#{msg.User}:"/>
+                        <p:inputText value="#{loginMB.user}"/>
+                        <h:outputText value="#{msg.Password}:"/>
+                        <p:password value="#{loginMB.password}"/>
+                    </h:panelGrid>
+                    <p:commandButton value="Login" action="#{loginMB.login}" ajax="false" update="growl"/>
+                </p:panel>
+            </h:form>
+        </h:panelGrid>
+    </h:body>
+</html>
+

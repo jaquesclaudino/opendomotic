@@ -1,0 +1,129 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../template/default.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:comp="http://java.sun.com/jsf/composite/comp">
+
+    <ui:define name="content">
+        
+        <!-- DIALOG -->
+        <comp:crudDialog header="#{msg.Device}" mb="#{configMB}">
+            <h:panelGrid id="panelDialog" columns="2" columnClasses="textRight">
+                #{msg.ClassName}
+                <p:selectOneMenu value="#{configMB.entity.deviceClassName}" valueChangeListener="#{configMB.valueChangeMethod}">
+                    <f:selectItem itemLabel="#{msg.Custom}"/>
+                    <f:selectItems value="#{configMB.listClassNames}"/>                        
+                    <p:ajax update="panelDialog tableProperty "/>
+                </p:selectOneMenu>  
+                
+                <h:outputText rendered="#{configMB.customClassName}"/>
+                <h:panelGroup rendered="#{configMB.customClassName}">
+                    <p:inputText id="customClassName" value="#{configMB.entity.deviceClassName}"/>
+                    <p:watermark for="customClassName" value="ex: com.my.CustomDevice"/>
+                </h:panelGroup>
+                
+                #{msg.Name}
+                <p:inputText value="#{configMB.entity.name}"/> 
+                
+                #{msg.Format}
+                <p:inputText value="#{configMB.entity.format}"/>
+                
+                #{msg.ThreadId}
+                <p:inputText value="#{configMB.entity.threadId}"/>
+                
+                <h:outputText value="#{msg.Type}"/>
+                <p:selectOneMenu value="#{configMB.entity.deviceType}">
+                    <f:selectItems value="#{configMB.deviceTypes}"/>                         
+                </p:selectOneMenu>
+                
+                <h:outputText value="#{msg.CustomScript}"/>
+                <p:inputTextarea value="#{configMB.entity.customScript}" rows="3" cols="40"/>
+                
+                <h:outputText value="#{msg.DefaultImage}"/>
+                <p:selectOneMenu value="#{configMB.entity.deviceImageDefault}" converter="#{entityConverter}">
+                    <f:selectItem itemLabel="#{msg.Select}"/>
+                    <f:selectItems value="#{imageMB.listAll}" var="i" itemLabel="#{i.name}" itemValue="#{i}"/>                         
+                </p:selectOneMenu>
+
+                <h:outputText value="#{msg.SwitchImage}"/>
+                <p:selectOneMenu value="#{configMB.entity.deviceImageSwitch}" converter="#{entityConverter}">
+                    <f:selectItem itemLabel="#{msg.None}"/>
+                    <f:selectItems value="#{imageMB.listAll}" var="i" itemLabel="#{i.name}"/>                         
+                </p:selectOneMenu>
+                
+                #{msg.Enabled}
+                <p:selectBooleanCheckbox value="#{configMB.entity.enabled}"/>
+                
+                #{msg.History}
+                <p:selectBooleanCheckbox value="#{configMB.entity.history}"/> 
+            </h:panelGrid>
+
+            <p:dataTable id="tableProperty" value="#{configMB.listDeviceProperty}" var="p">
+                <p:column>
+                    <f:facet name="header">#{msg.Property}</f:facet>
+                    <p:inputText value="#{p.name}"/>
+                </p:column>
+                <p:column>
+                    <f:facet name="header">#{msg.Value}</f:facet>
+                    <p:inputText value="#{p.value}"/>
+                </p:column>
+            </p:dataTable>
+        </comp:crudDialog>
+
+        <!-- TABLE -->
+        <comp:crudTable mb="#{configMB}" rows="10" customButtonValue="#{msg.UploadImages}" customButtonAction="/admin/image" customButton="true">
+            <p:column headerText="Thr">
+                #{item.threadId}
+            </p:column>
+            <p:column headerText="#{msg.Name}">
+                #{item.name}
+            </p:column>
+            <p:column headerText="#{msg.Value}">
+                #{configMB.getDeviceValueAsString(item)}
+            </p:column>
+            <p:column headerText="#{msg.Ms}">
+                #{configMB.getDeviceMillisResponse(item)}                
+                <f:facet name="footer">
+                    <p:commandLink value="#{configMB.getDeviceMillisResponseSum()}" onclick="alert('#{configMB.getDeviceMillisResponseFmt()}');"/>
+                </f:facet>
+            </p:column>
+            <p:column headerText="#{msg.Error}">
+                #{configMB.getDeviceErrors(item)}
+                <f:facet name="footer">  
+                    #{configMB.getDeviceErrorsSum()}
+                </f:facet>
+            </p:column>
+            <p:column headerText="#{msg.ClassName}">
+                #{item.deviceClassName}
+            </p:column>
+            <p:column headerText="#{msg.Format}">
+                #{item.format}
+            </p:column>
+            <p:column headerText="#{msg.Properties}">
+                #{item.listDeviceProperty}
+            </p:column>
+            <p:column headerText="#{msg.Image}" width="130">
+                <p:graphicImage 
+                    value="../resources/images/#{item.deviceImageDefault.fileName}" 
+                    rendered="#{!empty item.deviceImageDefault}"
+                    style="max-height: 100px;"/>
+                <p:graphicImage 
+                    value="../resources/images/#{item.deviceImageSwitch.fileName}" 
+                    rendered="#{!empty item.deviceImageSwitch}"
+                    style="max-height: 100px;"/>
+            </p:column>
+            <p:column headerText="#{msg.Enabled}" style="text-align: center;">
+                <p:graphicImage value="../resources/images/button/checked.png" rendered="#{item.enabled}"/>
+                <p:graphicImage value="../resources/images/button/unchecked.png" rendered="#{!item.enabled}"/>
+            </p:column>
+            <p:column width="95">
+                <p:commandButton value="#{msg.Test}" action="#{configMB.test(item)}" update="@form"/>
+            </p:column>
+        </comp:crudTable>
+
+    </ui:define>
+
+</ui:composition>

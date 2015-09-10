@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../template/default.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="content">
+        <h:panelGroup rendered="#{empty historyMB.listDeviceConfigHistory}">
+            <h:commandLink style="font-weight: bold;" value="#{msg.WithoutHistory}" action="/admin/config"/>
+            <br/>
+            <br/>
+        </h:panelGroup>
+
+        <h:panelGroup id="panelGroupHistory" rendered="#{!empty historyMB.listDeviceConfigHistory}">
+            <f:event type="preRenderView" listener="#{historyMB.checkParamName}"/>
+            
+            <p:growl id="growl" showDetail="true" />  
+
+            <p:poll interval="30" listener="#{historyMB.refresh}" update="panel,grafico" />
+
+            <p:panel>
+                <h:panelGrid columns="2">
+                    <h:outputText value="#{msg.Device}"/>
+                    <h:selectOneMenu value="#{historyMB.idConfig}" valueChangeListener="#{historyMB.configChangeMethod}">
+                        <f:selectItems value="#{historyMB.listDeviceConfigHistory}" var="d" itemValue="#{d.id}" itemLabel="#{d.name}"/>
+                        <p:ajax update="panel,grafico"/>
+                    </h:selectOneMenu> 
+
+                    <h:outputText value="#{msg.Interval}:"/>
+                    <h:selectOneMenu value="#{historyMB.minutesInterval}" valueChangeListener="#{historyMB.intervalChangeMethod}">
+                        <f:selectItem itemValue="1"/>
+                        <f:selectItem itemValue="2"/>
+                        <f:selectItem itemValue="3"/>
+                        <f:selectItem itemValue="4"/>
+                        <f:selectItem itemValue="5"/>
+                        <f:selectItem itemValue="10"/>
+                        <f:selectItem itemValue="15"/>
+                        <f:selectItem itemValue="30"/>
+                        <p:ajax update="panel,grafico"/>
+                    </h:selectOneMenu>
+                </h:panelGrid>
+            </p:panel>
+
+            <br/>
+
+            <h:panelGrid id="panel" columns="4">
+                <h:outputText value="#{msg.Current}:"/>
+                <h:outputText value="#{historyMB.last.value}" style="font-weight: bold"/>
+                |
+                <h:outputText value="#{historyMB.last.date}">
+                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />  
+                </h:outputText>
+
+                <h:outputText value="#{msg.Max}:"/>
+                <h:outputText value="#{historyMB.max.value}" style="font-weight: bold; color: red;"/>
+                |
+                <h:outputText value="#{historyMB.max.date}">
+                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />  
+                </h:outputText>
+
+                <h:outputText value="#{msg.Min}:"/>
+                <h:outputText value="#{historyMB.min.value}" style="font-weight: bold; color: blue;"/>
+                |
+                <h:outputText value="#{historyMB.min.date}">
+                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />  
+                </h:outputText>            
+            </h:panelGrid>
+
+            <p:lineChart id="grafico" 
+                         value="#{historyMB.linearModel}" 
+                         minY="#{historyMB.min.value}" 
+                         maxY="#{historyMB.max.value}"
+                         legendPosition="e"
+                         style="height:600px" 
+                         xaxisAngle="-90"
+                         zoom="true">
+                <p:ajax event="itemSelect" listener="#{historyMB.itemSelect}" update="growl" />  
+            </p:lineChart>
+        </h:panelGroup>
+    </ui:define>
+
+</ui:composition>

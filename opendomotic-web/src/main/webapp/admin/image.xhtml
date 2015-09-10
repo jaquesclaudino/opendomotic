@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../template/default.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:comp="http://java.sun.com/jsf/composite/comp">
+
+    <ui:define name="content">
+            
+        <!-- DIALOG -->
+        <comp:crudDialog id="dialog" header="#{msg.Image}" mb="#{imageMB}" updateSalvar="dialog">               
+            <h:panelGrid columns="2">
+                <h:outputText value="#{msg.Name}"/>
+                <p:inputText value="#{imageMB.entity.name}"/>
+
+                <h:outputText value="#{msg.Image}"/>
+                <h:outputText value="#{msg.SaveToEnableUpload}" rendered="#{imageMB.entity.id == null}"/>
+                <h:panelGrid columns="2" rendered="#{imageMB.entity.id != null}">
+                    <p:graphicImage 
+                        value="../resources/images/#{imageMB.entity.fileName}" 
+                        rendered="#{!empty imageMB.entity.fileName}"/>
+
+                    <p:fileUpload 
+                        fileUploadListener="#{imageMB.handleFileUpload}"  
+                        label="#{msg.Upload}"
+                        mode="advanced"  
+                        update="dialog"  
+                        auto="true"  
+                        allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
+                </h:panelGrid>
+            </h:panelGrid>
+        </comp:crudDialog>
+
+        <!-- TABLE -->
+        <comp:crudTable mb="#{imageMB}" rows="10">
+            <p:column headerText="#{msg.Name}">
+                #{item.name}
+            </p:column>
+            <p:column headerText="#{msg.Image}">
+                <p:graphicImage 
+                    value="../resources/images/#{item.fileName}" 
+                    rendered="#{!empty item.fileName}"/>
+                #{item.fileName}
+            </p:column>
+        </comp:crudTable>
+    </ui:define>
+
+</ui:composition>

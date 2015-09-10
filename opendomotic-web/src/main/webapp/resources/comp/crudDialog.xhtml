@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://java.sun.com/jsf/composite">
+
+    <!-- INTERFACE -->
+    <cc:interface>
+        <cc:attribute name="header" required="true" type="String"/>
+        <cc:attribute name="mb" required="true" type="com.opendomotic.mb.crud.AbstractSelectableCRUD"/>
+        <cc:attribute name="updateSalvar" default="" type="String"/>
+        <cc:attribute name="width" type="Integer"/>        
+    </cc:interface>
+
+    <!-- IMPLEMENTATION -->
+    <cc:implementation>
+        <p:growl id="growl"/>
+        
+        <p:dialog id="dialog" header="#{cc.attrs.header}" visible="#{cc.attrs.mb.visible}" closeOnEscape="true" width="#{cc.attrs.width}">
+            <p:ajax event="close" listener="#{cc.attrs.mb.handleClose}"/>
+            <p:focus context="dialog"/>
+
+            <!-- PANELGRID -->
+            <cc:insertChildren/>
+
+            <p:separator/>
+            <p:defaultCommand target="salvar"/>                    
+            <p:commandButton id="salvar" value="#{msg.Save}" action="#{cc.attrs.mb.save}" update="@form #{cc.attrs.updateSalvar}"/>
+            <p:commandButton id="cancelar" value="#{msg.Cancel}" action="#{cc.attrs.mb.cancel}" update="dialog"/>
+        </p:dialog>
+    </cc:implementation>
+</html>

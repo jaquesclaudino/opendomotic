@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../template/default.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="content">
+        
+        <h:outputScript library="js" name="device.js"/>
+        <h:outputScript library="js" name="canvasCore.js"/>
+        <h:outputScript library="js" name="canvasAdmin.js"/>
+
+        <p:panel id="panel">
+            <h:panelGrid columns="2">
+                <h:outputText value="#{msg.Environment}"/>                    
+                <p:selectOneMenu value="#{positionMB.idEnvironment}" valueChangeListener="#{positionMB.valueChangeMethod}">
+                    <f:selectItems value="#{environmentMB.listAll}" var="e" itemValue="#{e.id}" itemLabel="#{e.name}"/>
+                    <p:ajax update="panel,panelGroupCanvas"/>
+                </p:selectOneMenu>
+
+                <h:outputText value="#{msg.Device}"/>
+                <p:selectOneMenu value="#{positionMB.idConfig}">
+                    <f:selectItems value="#{configMB.listAllOrderByName}" var="d" itemValue="#{d.id}" itemLabel="#{d.name}"/>
+                </p:selectOneMenu>    
+            </h:panelGrid>
+
+            <p:commandButton value="#{msg.Add}" action="#{positionMB.add}" update="panelGroupCanvas"/>
+            <p:commandButton value="#{msg.Remove}" action="#{positionMB.remove}" update="panelGroupCanvas"/>
+            <p:commandButton value="#{msg.Clear}" action="#{positionMB.clear}" update="panelGroupCanvas"/>
+        </p:panel>
+
+        <br/>
+
+        <h:panelGroup id="panelGroupCanvas">
+            <div id="divCanvas" style="width: 100%; height: 100%; overflow: auto;">
+                <canvas id="canvas"></canvas>
+            </div>
+            <script>
+                drawCanvas(#{positionMB.idEnvironment});
+            </script>
+        </h:panelGroup>            
+            
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://java.sun.com/jsf/composite"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+
+    <!-- INTERFACE -->
+    <cc:interface>
+        <cc:attribute name="mb" required="true" type="com.opendomotic.mb.crud.AbstractSelectableCRUD"/>
+        <cc:attribute name="renderedExcluir" default="true" type="Boolean"/> 
+        <cc:attribute name="updateRowSelect" default="" type="String"/>
+        <cc:attribute name="rows" default="20" type="Integer"/>
+
+        <cc:attribute name="customButton" default="false" type="Boolean"/> 
+        <cc:attribute name="customButtonValue" default="" type="String"/> 
+        <cc:attribute name="customButtonAction" method-signature="String action()"/>
+        <cc:attribute name="rowStyleClass"/>
+    </cc:interface>
+
+    <!-- IMPLEMENTATION -->
+    <cc:implementation>
+        <p:dataTable id="table" value="#{cc.attrs.mb.dataModel}" var="item" 
+                     selectionMode="single" selection="#{cc.attrs.mb.selected}"  
+                     paginator="true" paginatorAlwaysVisible="false" paginatorPosition="bottom" 
+                     rows="#{cc.attrs.rows}" rowsPerPageTemplate="5,10,20,50" lazy="true" 
+                     rowStyleClass="#{cc.attrs.rowStyleClass}"
+                     emptyMessage="#{msg.NoRecords}">
+            
+            <cc:insertFacet name="header"/>
+            <f:facet name="header">
+                <h:panelGroup id="toolbar">        
+                    <p:commandButton value="#{msg.New}" action="#{cc.attrs.mb.create}" update="@form" process="@this" />
+                    <p:commandButton value="#{msg.Edit}" action="#{cc.attrs.mb.editSelected}" update="@form" process="@this" disabled="#{cc.attrs.mb.selected == null}" />
+                    <p:commandButton value="#{msg.Delete}" action="#{cc.attrs.mb.deleteSelected}" update="table" immediate="true" disabled="#{cc.attrs.mb.selected == null}" 
+                                     onclick="return confirm('#{msg.ConfirmsTheExclusion}?');" rendered="#{cc.attrs.renderedExcluir}"/>
+
+                    <p:commandButton value="#{cc.attrs.customButtonValue}" action="#{cc.attrs.customButtonAction}" ajax="false" immediate="true" rendered="#{cc.attrs.customButton}"/>
+                </h:panelGroup>
+            </f:facet>            
+
+            <p:ajax event="rowSelect" update="toolbar #{cc.attrs.updateRowSelect}"/>  
+
+            <!-- COLUMN -->
+            <cc:insertChildren/>
+        </p:dataTable>
+    </cc:implementation>
+</html>
