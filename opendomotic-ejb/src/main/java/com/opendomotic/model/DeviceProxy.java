@@ -73,7 +73,7 @@ public class DeviceProxy implements Device {
         }
         
         if (history != null && value != null) {
-            history.add(new Date(), value);
+            history.add(new Date(), (Comparable) value);
         }
 
         return changed;        
