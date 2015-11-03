@@ -3,6 +3,7 @@ package com.opendomotic.device.impl;
 import com.opendomotic.device.Device;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Arrays;
 
@@ -39,7 +40,9 @@ public class SocketDevice<T> implements Device<T> {
     }
     
     protected int[] writeSocket(String command, boolean waitRx) throws IOException, InterruptedException {
-        try (Socket socket = new Socket(host, port)) {            
+        try (Socket socket = new Socket()) {       
+            socket.connect(new InetSocketAddress(host, port), timeout);
+            socket.setSoTimeout(timeout);
             socket.getOutputStream().write(command.getBytes());
             
             if (waitRx) {
