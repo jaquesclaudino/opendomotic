@@ -2,6 +2,7 @@ package com.opendomotic.mb;
 
 import com.opendomotic.model.entity.Environment;
 import com.opendomotic.service.dao.EnvironmentDAO;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.logging.Level;
@@ -10,6 +11,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -46,6 +48,12 @@ public class HomeMB implements Serializable {
                 idEnvironment = environment.getId();
             }
         }
+    }
+    
+    public void valueChangeMethod(ValueChangeEvent e) throws IOException {
+        LOG.info(e.getNewValue().toString());
+        idEnvironment = (Integer) e.getNewValue();
+        getExternalContext().redirect(getExternalContext().getRequestContextPath() + "/user/index.jsf");
     }
     
     public Integer getIdEnvironment() {

@@ -11,12 +11,11 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
 /**
  *
@@ -25,6 +24,8 @@ import javax.persistence.criteria.Root;
 @Named
 @SessionScoped
 public class JobMB extends AbstractSelectableCRUD<Job> {
+    
+    private static final Logger LOG = Logger.getLogger(JobMB.class.getName());
     
     @Inject
     private JobDAO jobDAO;
@@ -93,9 +94,13 @@ public class JobMB extends AbstractSelectableCRUD<Job> {
         super.edit(entity); 
     }
     
-    public void toggleEnable(Job job) {
+    public void toggleEnable(int id) {
+        LOG.log(Level.INFO, "id={0}", id);
+        Job job = jobDAO.findById(id);
+        LOG.info(job.toString());
         job.setEnabled(!job.isEnabled());
         jobDAO.save(job);
+        clearList();
     }
 
     @Override

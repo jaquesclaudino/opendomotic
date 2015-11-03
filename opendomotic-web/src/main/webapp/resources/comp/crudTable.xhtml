@@ -34,7 +34,7 @@
                     <p:commandButton value="#{msg.New}" action="#{cc.attrs.mb.create}" update="@form" process="@this" />
                     <p:commandButton value="#{msg.Edit}" action="#{cc.attrs.mb.editSelected}" update="@form" process="@this" disabled="#{cc.attrs.mb.selected == null}" />
                     <p:commandButton value="#{msg.Delete}" action="#{cc.attrs.mb.deleteSelected}" update="table" immediate="true" disabled="#{cc.attrs.mb.selected == null}" 
-                                     onclick="return confirm('#{msg.ConfirmsTheExclusion}?');" rendered="#{cc.attrs.renderedExcluir}"/>
+                                     onclick="return confirm('#{msg.ConfirmExclusion}?');" rendered="#{cc.attrs.renderedExcluir}"/>
 
                     <p:commandButton value="#{cc.attrs.customButtonValue}" action="#{cc.attrs.customButtonAction}" ajax="false" immediate="true" rendered="#{cc.attrs.customButton}"/>
                 </h:panelGroup>

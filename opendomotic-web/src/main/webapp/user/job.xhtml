@@ -88,8 +88,10 @@
                 <p:graphicImage value="../resources/images/button/unchecked.png" rendered="#{!item.deleteAfterExecute}"/>
             </p:column>
             <p:column headerText="#{msg.Enabled}" style="text-align: center;">
-                <p:graphicImage value="../resources/images/button/checked.png" rendered="#{item.enabled}"/>
-                <p:graphicImage value="../resources/images/button/unchecked.png" rendered="#{!item.enabled}"/>
+                <h:commandLink action="#{jobMB.toggleEnable(item.id)}" onclick="return confirm('#{msg.ConfirmChange}? (id=#{item.id})');">
+                    <p:graphicImage value="../resources/images/button/checked.png" rendered="#{item.enabled}"/>
+                    <p:graphicImage value="../resources/images/button/unchecked.png" rendered="#{!item.enabled}"/>
+                </h:commandLink>
             </p:column>
         </comp:crudTable>
 

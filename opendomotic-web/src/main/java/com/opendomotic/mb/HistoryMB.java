@@ -6,7 +6,7 @@ import com.opendomotic.service.DeviceService;
 import com.opendomotic.service.dao.DeviceConfigDAO;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -31,6 +31,7 @@ public class HistoryMB implements Serializable {
     
     private static final Logger LOG = Logger.getLogger(HistoryMB.class.getName());
     private static final int DEFAULT_INTERVAL = 10;
+    private static final int DEFAULT_MAX_ITEMS = 100;
     
     @Inject 
     private DeviceService deviceService;
@@ -40,18 +41,21 @@ public class HistoryMB implements Serializable {
     
     private DeviceConfig config;
     private DeviceHistory history;
-    private CartesianChartModel linearModel;   
+    private CartesianChartModel linearModel;  
+    private List<String> listItem;
     private LineChartSeries lineSeries;
     private DeviceHistory.DeviceHistoryItem min;
     private DeviceHistory.DeviceHistoryItem max;
-    private DeviceHistory.DeviceHistoryItem last;
-    private int minutesInterval = DEFAULT_INTERVAL;
-    private int idConfig;
+    private DeviceHistory.DeviceHistoryItem last;    
     private List<DeviceConfig> listDeviceConfigHistory;
+    
+    private int idConfig;
+    private int minutesInterval = DEFAULT_INTERVAL;
+    private int maxItems = DEFAULT_MAX_ITEMS;
     
     @PostConstruct
     public void init() {
-        listDeviceConfigHistory = deviceConfigDAO.findAllWithHistory();        
+        listDeviceConfigHistory = deviceConfigDAO.findAllEnabledWithHistory();        
         if (!listDeviceConfigHistory.isEmpty()) {
             refresh(listDeviceConfigHistory.get(0));
         }
@@ -69,7 +73,6 @@ public class HistoryMB implements Serializable {
         this.config = config;
         this.history = deviceService.getDeviceHistory(config);
         if (history != null) {
-            extractMinMax();
             createLinearModel();
         }
     }
@@ -88,42 +91,45 @@ public class HistoryMB implements Serializable {
     private void createLinearModel() {
         lineSeries = new LineChartSeries();
         lineSeries.setLabel(config.getName());
+        lineSeries.setFill(true);
         linearModel = new CartesianChartModel();
-        linearModel.addSeries(lineSeries);  
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm"); 
-        last = null;   
-
-        Iterator<DeviceHistory.DeviceHistoryItem> it = history.getList().iterator();
-        while (it.hasNext()) {
-            DeviceHistory.DeviceHistoryItem item = it.next();
-                        
-            if (last == null || 
-                    !it.hasNext() || 
-                    item == min ||
-                    item == max ||                    
-                    item.getDate().getTime() - last.getDate().getTime() >= minutesInterval*60*1000) {
-                String dt = sdf.format(item.getDate());
-                lineSeries.set(dt, item.getValueAsInt());
-                last = item;
-            }
-        }
+        linearModel.addSeries(lineSeries); 
+        listItem = new ArrayList<>();        
+        List<DeviceHistory.DeviceHistoryItem> list = history.getListCopy(minutesInterval, maxItems);
+        SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat());
         
+        last = null; 
+        min = null;
+        max = null;
+        
+        if (!list.isEmpty()) {        
+            for (DeviceHistory.DeviceHistoryItem item : list) {
+                String dateFmt = sdf.format(item.getDate());
+                if (!lineSeries.getData().containsKey(dateFmt)) {
+                    lineSeries.set(dateFmt, (Number) item.getValue());
+                    listItem.add(String.format("%s = %s", dateFmt, item.getValue().toString()));
+                }
+                
+                if (min == null || item.getValue().compareTo(min.getValue()) < 0) {
+                    min = item;
+                }
+                if (max == null || item.getValue().compareTo(max.getValue()) > 0) {
+                    max = item;
+                }
+            }   
+            
+            last = list.get(list.size()-1);
+        }        
     }
     
-    private void extractMinMax() {
-        min = null;
-        max = null;  
-
-        for (DeviceHistory.DeviceHistoryItem item : history.getList()) {
-            Integer value = item.getValueAsInt();
-            
-            if (min == null || value < min.getValueAsInt()) {
-                min = item;
-            }
-            if (max == null || value > max.getValueAsInt()) {
-                max = item;
-            }
+    private String getDateFormat() {
+        if (minutesInterval*maxItems > 1000) {
+            return "dd/MM HH:mm";
+        }        
+        if (minutesInterval == 0) {
+            return "HH:mm:ss";
         }
+        return "HH:mm";
     }
     
     public void configChangeMethod(ValueChangeEvent e) {
@@ -136,9 +142,15 @@ public class HistoryMB implements Serializable {
         refresh();
     }
     
-    public void itemSelect(ItemSelectEvent event) {      
+    public void maxItemsChangeMethod(ValueChangeEvent e) {
+        LOG.info(e.getNewValue().toString());
+        maxItems = (Integer) e.getNewValue();
+        refresh();
+    }
+    
+    public void itemSelect(ItemSelectEvent event) {
         FacesContext.getCurrentInstance().addMessage(null, 
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Selecionado:", "index "+ event.getSeriesIndex()));  
+                new FacesMessage(FacesMessage.SEVERITY_INFO, listItem.get(event.getItemIndex()), ""));  
     }
     
     public CartesianChartModel getLinearModel() {      
@@ -179,6 +191,14 @@ public class HistoryMB implements Serializable {
 
     public List<DeviceConfig> getListDeviceConfigHistory() {
         return listDeviceConfigHistory;
+    }
+
+    public int getMaxItems() {
+        return maxItems;
+    }
+
+    public void setMaxItems(int maxItems) {
+        this.maxItems = maxItems;
     }
     
 }
